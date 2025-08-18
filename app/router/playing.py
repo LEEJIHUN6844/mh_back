@@ -19,7 +19,7 @@ def get_playing_data():
         db = get_db()
         cursor = db.cursor(dictionary=True)
         cursor.execute(
-            "SELECT storeId, searchId, wide_area, basic_area, keyword, name, category, rating, review_cnt, address, url, main_photo FROM store_playing"
+            "SELECT storeId, searchId, wide_area, basic_area, keyword, name, category, rating, review_cnt, address, url, main_photo, hon0_index FROM store_playing"
         )
         results = cursor.fetchall()
         cursor.close()
@@ -30,7 +30,7 @@ def get_playing_data():
 
 # 혼놀 리뷰 데이터
 @router.get("/api/playing/{storeId}/review")
-def get_eating_review(storeId: str):
+def get_playing_review(storeId: str):
     try:
         db = get_db()
         cursor = db.cursor(dictionary=True)

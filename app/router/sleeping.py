@@ -11,14 +11,14 @@ def get_db():
         password=os.getenv("MYSQL_PASSWORD"),
         database=os.getenv("MYSQL_DB")
     )
-
+# 혼숙 가게 데이터
 @router.get("/api/sleeping")
 def get_sleeping_data():
     try:
         db = get_db()
         cursor = db.cursor(dictionary=True)
         cursor.execute(
-            "SELECT storeId, searchId, wide_area, basic_area, keyword, name, category, rating, review_cnt, address, url, main_photo FROM store_sleeping"
+            "SELECT storeId, searchId, wide_area, basic_area, keyword, name, category, rating, review_cnt, address, url, main_photo, hon0_index FROM store_sleeping"
         )
         results = cursor.fetchall()
         cursor.close()
@@ -27,7 +27,7 @@ def get_sleeping_data():
     except Exception as e:
         return {"error": str(e)}
 
-
+# 혼숙 리뷰 데이터
 @router.get("/api/sleeping/{storeId}/review")
 def get_sleeping_review(storeId: str):
     try:

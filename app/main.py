@@ -17,7 +17,12 @@ app = FastAPI()
 # CORS 설정 (리액트에서 요청 가능하도록)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # 프론트엔드 주소(도메인 생기면 그거로 변경)
+    allow_origins=[
+        "https://dbdbbook.site", 
+        "http://34.64.82.153:3000", 
+        "http://34.64.82.153",
+        "http://localhost:3000"
+        ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

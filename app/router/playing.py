@@ -13,13 +13,13 @@ def get_db():
     )
 
 # 혼놀 가게 데이터
-@router.get("/api/playing")
+@router.get("/playing")
 def get_playing_data():
     try:
         db = get_db()
         cursor = db.cursor(dictionary=True)
         cursor.execute(
-            "SELECT storeId, searchId, wide_area, basic_area, keyword, name, category, rating, review_cnt, address, url, main_photo, hon0_index FROM store_playing"
+            "SELECT storeid, searchid, wide_area, basic_area, keyword, storename, category, rating, review_cnt, address, url, img_url, honbab_cnt FROM store_playing"
         )
         results = cursor.fetchall()
         cursor.close()
@@ -29,13 +29,13 @@ def get_playing_data():
         return {"error": str(e)}
 
 # 혼놀 리뷰 데이터
-@router.get("/api/playing/{storeId}/review")
+@router.get("/playing/{storeId}/review")
 def get_playing_review(storeId: str):
     try:
         db = get_db()
         cursor = db.cursor(dictionary=True)
         cursor.execute(
-            "SELECT reviewId, storeId, searchId, reviewIdx, reviewTxt FROM review_playing WHERE storeId=%s ORDER BY reviewId",
+            "SELECT reviewid, storeid, searchid, reviewidx, reviewtxt FROM review_playing WHERE storeId=%s ORDER BY reviewId",
             (storeId,)
         )
         reviews = cursor.fetchall()

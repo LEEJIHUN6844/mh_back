@@ -107,10 +107,11 @@ class PlanRequest(BaseModel):
 async def get_plan(req: PlanRequest):
     roadmap = []
 
+    # 프론트 체크박스 기준으로 매핑
     kind_to_category_top = {
-        "혼밥": ["한식","분식","양식","패스트푸드"],
-        "혼놀": ["디저트","카페","도보","공원","박물관"],
-        "혼숙": ["호텔","모텔","펜션","캠핑, 야영"]
+        "혼밥": ["한식", "일식", "양식", "고기", "디저트", "기타"],
+        "혼놀": ["카페", "공원", "도보", "박물관", "기타"],
+        "혼숙": ["캠핑", "야영", "펜션", "호텔", "모텔", "기타"]
     }
 
     # ---------------- CSV 기반 선택 -----------------
@@ -132,9 +133,9 @@ async def get_plan(req: PlanRequest):
             else:
                 df_filtered = df_kind
 
-            # 키워드 필터
+            # 체크박스 키워드 필터
             if kind in req.keywords and req.keywords[kind]:
-                kw_mask = df_filtered['summary_bullets'].apply(
+                kw_mask = df_filtered['category_top'].apply(
                     lambda s: any(kw in str(s) for kw in req.keywords[kind])
                 )
                 df_filtered = df_filtered[kw_mask]
@@ -154,10 +155,9 @@ async def get_plan(req: PlanRequest):
                 })
         roadmap.append({"day": day, "plan": day_plan})
 
-    # ---------------- Gemini AI 요약 (JSON 안전 출력용) -----------------
+    # ---------------- Gemini AI 요약 -----------------
     model = genai.GenerativeModel("gemini-1.5-flash")
     
-    # 로드맵을 간략화해서 AI 혼동 방지
     roadmap_for_prompt = [
         {"day": d["day"], "plan": [{"storename": p["storename"], "category": p["category"]} for p in d["plan"]]}
         for d in roadmap
@@ -171,32 +171,20 @@ async def get_plan(req: PlanRequest):
 
     각 날짜별 "day"와 "summary"를 포함한 JSON 배열만 출력해주세요.
     JSON 외 다른 텍스트는 절대 포함하지 마세요.
-    예시:
-    [
-      {{"day": 1, "summary": "첫날은 카페와 공원을 둘러봅니다."}},
-      {{"day": 2, "summary": "둘째날은 호텔 체크인 후 박물관 관람"}}
-    ]
-    반드시 JSON 형식으로만 출력해주세요.
     """
 
     response = model.generate_content(prompt)
 
     day_summaries = []
     if response and response.text:
-        print("[DEBUG] AI 응답:", response.text)
         try:
-            # JSON 파싱 시도
             day_summaries = json.loads(response.text)
         except json.JSONDecodeError:
-            print("[ERROR] JSON 디코딩 실패:", response.text)
-            # 정규식으로 day, summary 추출
             matches = re.findall(r'\{.*?"day"\s*:\s*(\d+).*?"summary"\s*:\s*"(.*?)".*?\}', response.text, re.DOTALL)
             day_summaries = [{"day": int(day), "summary": summary.strip()} for day, summary in matches]
-            # 최후 fallback
             if not day_summaries:
                 day_summaries = [{"day": d["day"], "summary": "AI 설명 생성 실패"} for d in roadmap]
 
-    # ---------------- 요약을 roadmap에 병합 -----------------
     for day_plan in roadmap:
         match = next((s for s in day_summaries if s["day"] == day_plan["day"]), None)
         day_plan["ai_summary"] = match["summary"] if match else "AI 설명 생성 실패"

@@ -169,7 +169,7 @@ async def get_plan(req: PlanRequest):
     여행 일수: {req.nights + 1}일
     로드맵: {roadmap_for_prompt}
 
-    각 날짜별 "day"와 "summary"를 포함한 JSON 배열만 출력해주세요.
+    각 날짜별 "day"와 "summary"를 포함한 JSON 배열만 출력하고 야무지게 요약해주세요.
     JSON 외 다른 텍스트는 절대 포함하지 마세요.
     """
 

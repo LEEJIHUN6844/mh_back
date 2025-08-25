@@ -71,7 +71,7 @@ async def login(user: LoginRequest, response: Response):
         raise HTTPException(status_code=401, detail="비밀번호가 일치하지 않습니다.")
 
     # 쿠키 발급
-    response.set_cookie(key="userID", value=user_db["UserID"], httponly=True, samesite="lax")
+    response.set_cookie(key="UserID", value=user_db["UserID"], httponly=True, samesite="none")
     return {
         "message": "로그인 성공!",
         "UserName": user_db["UserName"]

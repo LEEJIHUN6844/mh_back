@@ -1,6 +1,11 @@
 # 진입점 – FastAPI 라우팅
 from dotenv import load_dotenv
-load_dotenv()
+from pathlib import Path
+import os
+
+env_path = Path(__file__).parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
 
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -45,8 +50,9 @@ import os
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv("SESSION_SECRET"),
-    max_age=60 * 30
+    max_age=60*30,
 )
+
 
 
 

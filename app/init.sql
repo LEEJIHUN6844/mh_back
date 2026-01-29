@@ -1,0 +1,9 @@
+CREATE DATABASE mhdb;
+
+USE mhdb;
+
+CREATE TABLE user (
+    UserID VARCHAR(20) PRIMARY KEY,
+    UserPW VARCHAR(100) NOT NULL,
+    UserName VARCHAR(20) NOT NULL
+);
